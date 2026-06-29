@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Sassy Voice</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main class="app">
+
+    <!-- MENU PAGE -->
+    <section id="menuPage" class="page active">
+      <div class="container menu">
+        <h1>🎵 My Sassy Voice</h1>
+        <p class="subtitle">Welcome to My Sassy Voice Music Player</p>
+
+        <div class="menu-buttons">
+          <button type="button" onclick="showPage('playlist')">📂 Playlist</button>
+          <button type="button" onclick="showPage('player')">🎧 Now Playing</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLAYLIST PAGE -->
+    <section id="playlistPage" class="page">
+      <div class="container">
+        <button type="button" class="link-button" onclick="showPage('menu')">← Menu</button>
+
+        <h1>Playlist</h1>
+
+        <div id="playlist"></div>
+      </div>
+    </section>
+
+    <!-- PLAYER PAGE -->
+    <section id="playerPage" class="page">
+      <div class="container">
+        <button type="button" class="link-button" onclick="showPage('playlist')">← Playlist</button>
+
+        <section class="player">
+          <img id="albumArt" class="cover" src="" alt="" style="display: none;">
+
+          <h2 id="title">No song selected</h2>
+          <p id="artist"></p>
+
+          <input type="range" id="progress" value="0" min="0" max="0">
+
+          <div class="time">
+            <span id="currentTime">00:00</span>
+            <span id="duration">00:00</span>
+          </div>
+
+          <div class="controls">
+            <button type="button" onclick="previousSong()">⏮</button>
+            <button type="button" id="playBtn" onclick="togglePlay()">▶</button>
+            <button type="button" onclick="nextSong()">⏭</button>
+          </div>
+
+          <div class="controls">
+            <button type="button" id="shuffleBtn" onclick="toggleShuffle()">🔀</button>
+            <button type="button" id="repeatBtn" onclick="cycleRepeat()">🔁</button>
+            <button type="button" onclick="stopSong()">⏹</button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom Now Playing Bar -->
+  <div id="miniPlayer" class="mini-player" style="display: none;">
+    <div class="mini-info">
+      <strong id="miniTitle"></strong>
+      <span id="miniArtist"></span>
+    </div>
+
+    <div class="mini-controls">
+      <button type="button" id="miniPlayBtn" onclick="togglePlay()">▶</button>
+      <button type="button" onclick="showPage('player')">Now Playing</button>
+    </div>
+  </div>
+
+  <!-- Important: only ONE audio element for the whole app -->
+  <audio id="audio"></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
