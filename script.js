@@ -1,209 +1,240 @@
+console.log("script.js loaded");
+
 // ===============================
-// My Sassy Voice - script.js
+// PLAYLIST DATA
 // ===============================
 
-// Song list
-const playlist = [
-  {
-    title: "The Entertainer",
-    artist: "Scott Joplin",
-    url: "assets/audio/entertainer.mp3",
-    albumArt: "assets/images/entertainer.png"
-  },
-  {
-    title: "Maple Leaf Rag",
-    artist: "Scott Joplin",
-    url: "assets/audio/maple_leaf_rag.mp3",
-    albumArt: "assets/images/maple_leaf_rag.png"
-  },
-  {
-    title: "The Easy Winners",
-    artist: "Scott Joplin",
-    url: "assets/audio/easy_winners.mp3",
-    albumArt: "assets/images/easy_winners.png"
-  },
-  {
-    title: "Pineapple Rag",
-    artist: "Scott Joplin",
-    url: "assets/audio/pineapple_rag.mp3",
-    albumArt: "assets/images/pineapple_rag.png"
-  },
-  {
-    title: "Elite Syncopations",
-    artist: "Scott Joplin",
-    url: "assets/audio/elite_syncopations.mp3",
-    albumArt: "assets/images/elite_syncopations.png"
-  },
-  {
-    title: "Searchlight Rag",
-    artist: "Scott Joplin",
-    url: "assets/audio/Searchlight_Rag.mp3",
-    albumArt: "assets/images/searchlight_rag.png"
-  },
-  {
-    title: "Original Rags",
-    artist: "Scott Joplin",
-    url: "assets/audio/Original_Rags.mp3",
-    albumArt: "assets/images/Original_Rags.png"
-  }
+const playlists = {
+  prayer: [
+    {
+      title: "Amazing Grace",
+      artist: "Prayer",
+      url: "assets/audio/Amazing_Grace.mp3",
+      albumArt: "assets/images/Amazing_Grace.png"
+    },
+    {
+      title: "Furusato",
+      artist: "Prayer",
+      url: "assets/audio/Furusato.mp3",
+      albumArt: "assets/images/Furusato.png"
+    }
+  ],
+
+  scott: [
+    {
+      title: "The Entertainer",
+      artist: "Scott Joplin",
+      url: "assets/audio/entertainer.mp3",
+      albumArt: "assets/images/entertainer.png"
+    },
+    {
+      title: "Maple Leaf Rag",
+      artist: "Scott Joplin",
+      url: "assets/audio/maple_leaf_rag.mp3",
+      albumArt: "assets/images/maple_leaf_rag.png"
+    },
+    {
+      title: "The Easy Winners",
+      artist: "Scott Joplin",
+      url: "assets/audio/easy_winners.mp3",
+      albumArt: "assets/images/easy_winners.png"
+    },
+    {
+      title: "Pineapple Rag",
+      artist: "Scott Joplin",
+      url: "assets/audio/pineapple_rag.mp3",
+      albumArt: "assets/images/pineapple_rag.png"
+    },
+    {
+      title: "Elite Syncopations",
+      artist: "Scott Joplin",
+      url: "assets/audio/elite_syncopations.mp3",
+      albumArt: "assets/images/elite_syncopations.png"
+    },
+    {
+      title: "Searchlight Rag",
+      artist: "Scott Joplin",
+      url: "assets/audio/Searchlight_Rag.mp3",
+      albumArt: "assets/images/searchlight_rag.png"
+    },
+    {
+      title: "Original Rags",
+      artist: "Scott Joplin",
+      url: "assets/audio/Original_Rags.mp3",
+      albumArt: "assets/images/Original_Rags.png"
+    }
+  ]
+};
+
+const allSongs = [
+  ...playlists.prayer,
+  ...playlists.scott
 ];
 
-// Default player state
+// ===============================
+// PLAYER STATE
+// ===============================
+
+// viewingPlaylist = playlist currently shown on playlist page
+// playingPlaylist = playlist currently playing in audio player
+let viewingPlaylist = "prayer";
+let playingPlaylist = "prayer";
+
 let currentSongIndex = null;
 let shuffleEnabled = false;
-let repeatMode = "off"; // off, one, all
-
-// HTML elements
-const menuPage = document.getElementById("menuPage");
-const playlistPage = document.getElementById("playlistPage");
-const playerPage = document.getElementById("playerPage");
-
-const playlistContainer = document.getElementById("playlist");
-const audio = document.getElementById("audio");
-
-const albumArt = document.getElementById("albumArt");
-const title = document.getElementById("title");
-const artist = document.getElementById("artist");
-const progress = document.getElementById("progress");
-const currentTime = document.getElementById("currentTime");
-const duration = document.getElementById("duration");
-
-const playBtn = document.getElementById("playBtn");
-const shuffleBtn = document.getElementById("shuffleBtn");
-const repeatBtn = document.getElementById("repeatBtn");
-
-const miniPlayer = document.getElementById("miniPlayer");
-const miniTitle = document.getElementById("miniTitle");
-const miniArtist = document.getElementById("miniArtist");
-const miniPlayBtn = document.getElementById("miniPlayBtn");
+let repeatMode = "off";
 
 // ===============================
-// Page Navigation
+// SHORTCUT
+// ===============================
+
+function $(id) {
+  return document.getElementById(id);
+}
+
+function getActiveList() {
+  if (playingPlaylist === "all") {
+    return allSongs;
+  }
+
+  return playlists[playingPlaylist];
+}
+
+function getCurrentSong() {
+  if (currentSongIndex === null) {
+    return null;
+  }
+
+  return getActiveList()[currentSongIndex];
+}
+
+// ===============================
+// PAGE NAVIGATION
 // ===============================
 
 function showPage(pageName) {
-  if (!menuPage || !playlistPage || !playerPage) return;
-
-  menuPage.classList.remove("active");
-  playlistPage.classList.remove("active");
-  playerPage.classList.remove("active");
+  $("menuPage").classList.remove("active");
+  $("playlistPage").classList.remove("active");
+  $("playerPage").classList.remove("active");
 
   if (pageName === "menu") {
-    menuPage.classList.add("active");
-  } else if (pageName === "playlist") {
-    playlistPage.classList.add("active");
-  } else {
-    playerPage.classList.add("active");
+    $("menuPage").classList.add("active");
+  }
+
+  if (pageName === "playlist") {
+    $("playlistPage").classList.add("active");
+  }
+
+  if (pageName === "player") {
+    $("playerPage").classList.add("active");
   }
 
   updateMiniPlayer();
 }
 
-// Optional compatibility for old buttons
-function goMenu() {
-  if (menuPage) {
-    showPage("menu");
-  } else {
-    window.location.href = "menu.html";
-  }
-}
-
-function goPlaylist() {
-  if (playlistPage) {
-    showPage("playlist");
-  } else {
-    window.location.href = "playlist.html";
-  }
-}
-
-function goPlayer() {
-  if (playerPage) {
-    showPage("player");
-  } else {
-    window.location.href = "player.html";
-  }
-}
-
 // ===============================
-// Playlist
+// PLAYLIST PAGE
 // ===============================
 
-function loadPlaylist() {
-  if (!playlistContainer) return;
+function openPlaylist(playlistName) {
+  viewingPlaylist = playlistName;
 
-  playlistContainer.innerHTML = "";
+  $("playlistMenu").style.display = "none";
+  $("playlistSongs").style.display = "block";
 
-  playlist.forEach((song, index) => {
-    playlistContainer.innerHTML += `
-      <div class="song" onclick="selectSong(${index})">
-        <img src="${song.albumArt}" alt="${song.title}">
-        <div>
-          <h2>${song.title}</h2>
-          <p>${song.artist}</p>
-        </div>
+  $("playlistTitle").textContent =
+    playlistName === "prayer"
+      ? "🙏 Prayer Playlist"
+      : "🎹 Scott Joplin Playlist";
+
+  loadPlaylistSongs();
+}
+
+function backToPlaylists() {
+  $("playlistSongs").style.display = "none";
+  $("playlistMenu").style.display = "flex";
+}
+
+function loadPlaylistSongs() {
+  const playlistBox = $("playlist");
+  playlistBox.innerHTML = "";
+
+  playlists[viewingPlaylist].forEach(function (song, index) {
+    const songButton = document.createElement("button");
+    songButton.type = "button";
+    songButton.className = "song";
+
+    songButton.innerHTML = `
+      <img src="${song.albumArt}" alt="${song.title}">
+      <div class="song-info">
+        <h2>${song.title}</h2>
+        <p>${song.artist}</p>
       </div>
     `;
+
+    songButton.addEventListener("click", function () {
+      playingPlaylist = viewingPlaylist;
+      playSong(index);
+      showPage("player");
+    });
+
+    playlistBox.appendChild(songButton);
   });
 }
 
-function selectSong(index) {
-  playSong(index);
-
-  if (playerPage) {
-    showPage("player");
-  } else {
-    window.location.href = "player.html";
-  }
-}
-
 // ===============================
-// Player
+// PLAYER FUNCTIONS
 // ===============================
 
 function playSong(index) {
-  if (!audio) return;
-
   currentSongIndex = index;
 
-  const song = playlist[currentSongIndex];
+  const song = getCurrentSong();
+  const audio = $("audio");
+
+  if (!song) {
+    showNoSongSelected();
+    return;
+  }
 
   audio.src = song.url;
   audio.currentTime = 0;
-  audio.play();
 
-  if (albumArt) {
-    albumArt.src = song.albumArt;
-    albumArt.alt = song.title;
-    albumArt.style.display = "block";
-  }
+  audio.play().catch(function () {
+    console.log("Audio play blocked until user interaction.");
+  });
 
-  if (title) title.textContent = song.title;
-  if (artist) artist.textContent = song.artist;
-
-  if (playBtn) playBtn.textContent = "⏸";
-  if (miniPlayBtn) miniPlayBtn.textContent = "⏸";
-
+  updatePlayerDisplay(song, true);
   saveState();
   updateMiniPlayer();
 }
 
-function togglePlay() {
-  if (!audio) return;
+function playAllSong(index) {
+  playingPlaylist = "all";
+  currentSongIndex = index;
+  playSong(currentSongIndex);
+}
 
-  // If no song is selected, play the first song
+function togglePlay() {
+  const audio = $("audio");
+
   if (currentSongIndex === null) {
-    playSong(0);
+    playAllSong(0);
     return;
   }
 
   if (audio.paused) {
-    audio.play();
-    if (playBtn) playBtn.textContent = "⏸";
-    if (miniPlayBtn) miniPlayBtn.textContent = "⏸";
+    audio.play().catch(function () {
+      console.log("Audio play blocked.");
+    });
+
+    $("playBtn").textContent = "⏸";
+    $("miniPlayBtn").textContent = "⏸";
   } else {
     audio.pause();
-    if (playBtn) playBtn.textContent = "▶";
-    if (miniPlayBtn) miniPlayBtn.textContent = "▶";
+
+    $("playBtn").textContent = "▶";
+    $("miniPlayBtn").textContent = "▶";
   }
 
   saveState();
@@ -211,23 +242,27 @@ function togglePlay() {
 }
 
 function previousSong() {
+  const list = getActiveList();
+
   if (currentSongIndex === null) {
-    playSong(0);
+    playAllSong(0);
     return;
   }
 
   currentSongIndex--;
 
   if (currentSongIndex < 0) {
-    currentSongIndex = playlist.length - 1;
+    currentSongIndex = list.length - 1;
   }
 
   playSong(currentSongIndex);
 }
 
 function nextSong() {
+  const list = getActiveList();
+
   if (currentSongIndex === null) {
-    playSong(0);
+    playAllSong(0);
     return;
   }
 
@@ -236,7 +271,7 @@ function nextSong() {
   } else {
     currentSongIndex++;
 
-    if (currentSongIndex >= playlist.length) {
+    if (currentSongIndex >= list.length) {
       currentSongIndex = 0;
     }
   }
@@ -245,7 +280,7 @@ function nextSong() {
 }
 
 function stopSong() {
-  if (!audio) return;
+  const audio = $("audio");
 
   audio.pause();
   audio.currentTime = 0;
@@ -254,6 +289,8 @@ function stopSong() {
 
   currentSongIndex = null;
 
+  localStorage.removeItem("playingPlaylist");
+  localStorage.removeItem("viewingPlaylist");
   localStorage.removeItem("selectedSong");
   localStorage.removeItem("currentTime");
   localStorage.removeItem("isPlaying");
@@ -262,50 +299,47 @@ function stopSong() {
   updateMiniPlayer();
 }
 
+function updatePlayerDisplay(song, playing) {
+  $("albumArt").src = song.albumArt;
+  $("albumArt").alt = song.title;
+  $("albumArt").style.display = "block";
+
+  $("title").textContent = song.title;
+  $("artist").textContent = song.artist;
+
+  $("playBtn").textContent = playing ? "⏸" : "▶";
+  $("miniPlayBtn").textContent = playing ? "⏸" : "▶";
+}
+
 function showNoSongSelected() {
-  if (albumArt) {
-    albumArt.src = "";
-    albumArt.alt = "";
-    albumArt.style.display = "none";
-  }
+  $("albumArt").src = "";
+  $("albumArt").alt = "";
+  $("albumArt").style.display = "none";
 
-  if (title) title.textContent = "No song selected";
-  if (artist) artist.textContent = "";
+  $("title").textContent = "No song selected";
+  $("artist").textContent = "";
 
-  if (progress) {
-    progress.value = 0;
-    progress.max = 0;
-  }
+  $("progress").value = 0;
+  $("progress").max = 0;
 
-  if (currentTime) currentTime.textContent = "00:00";
-  if (duration) duration.textContent = "00:00";
+  $("currentTime").textContent = "00:00";
+  $("duration").textContent = "00:00";
 
-  if (playBtn) playBtn.textContent = "▶";
-  if (miniPlayBtn) miniPlayBtn.textContent = "▶";
+  $("playBtn").textContent = "▶";
+  $("miniPlayBtn").textContent = "▶";
 }
 
 // ===============================
-// Shuffle and Repeat
+// SHUFFLE AND REPEAT
 // ===============================
-
-function setControlButtonsDefault() {
-  if (shuffleBtn) shuffleBtn.style.opacity = "0.4";
-  if (repeatBtn) {
-    repeatBtn.textContent = "🔁";
-    repeatBtn.style.opacity = "0.4";
-  }
-}
 
 function toggleShuffle() {
   shuffleEnabled = !shuffleEnabled;
-
-  if (shuffleBtn) {
-    shuffleBtn.style.opacity = shuffleEnabled ? "1" : "0.4";
-  }
+  $("shuffleBtn").style.opacity = shuffleEnabled ? "1" : "0.4";
 }
 
 function cycleRepeat() {
-  if (!repeatBtn) return;
+  const repeatBtn = $("repeatBtn");
 
   if (repeatMode === "off") {
     repeatMode = "one";
@@ -323,52 +357,179 @@ function cycleRepeat() {
 }
 
 // ===============================
-// Mini Now Playing Bar
+// MINI PLAYER
 // ===============================
 
 function updateMiniPlayer() {
-  if (!miniPlayer) return;
+  const song = getCurrentSong();
 
-  if (currentSongIndex === null) {
-    miniPlayer.style.display = "none";
+  if (!song) {
+    $("miniPlayer").style.display = "none";
     return;
   }
 
-  const song = playlist[currentSongIndex];
+  const audio = $("audio");
 
-  if (miniTitle) miniTitle.textContent = `🎵 ${song.title}`;
-  if (miniArtist) miniArtist.textContent = song.artist;
-  if (miniPlayBtn) miniPlayBtn.textContent = audio && audio.paused ? "▶" : "⏸";
+  $("miniTitle").textContent = `🎵 ${song.title}`;
+  $("miniArtist").textContent = song.artist;
+  $("miniPlayBtn").textContent = audio.paused ? "▶" : "⏸";
 
-  // Show mini player on menu and playlist, hide it on full player
   if (
-    (menuPage && menuPage.classList.contains("active")) ||
-    (playlistPage && playlistPage.classList.contains("active")) ||
-    (!playerPage && !audio)
+    $("menuPage").classList.contains("active") ||
+    $("playlistPage").classList.contains("active")
   ) {
-    miniPlayer.style.display = "flex";
-  } else if (!playerPage) {
-    miniPlayer.style.display = "flex";
+    $("miniPlayer").style.display = "flex";
   } else {
-    miniPlayer.style.display = "none";
+    $("miniPlayer").style.display = "none";
   }
 }
 
 // ===============================
-// Progress and Time
+// TIME AND PROGRESS
 // ===============================
 
-if (audio) {
-  audio.addEventListener("timeupdate", () => {
+function updateTimeDisplay() {
+  const audio = $("audio");
+  const progress = $("progress");
+
+  progress.max = audio.duration || 0;
+  progress.value = audio.currentTime || 0;
+
+  $("currentTime").textContent = formatTime(audio.currentTime);
+  $("duration").textContent = formatTime(audio.duration);
+}
+
+function formatTime(seconds) {
+  if (!seconds || isNaN(seconds)) {
+    return "00:00";
+  }
+
+  const minutes = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+
+  return `${minutes}:${String(secs).padStart(2, "0")}`;
+}
+
+function getRandomSongIndex() {
+  const list = getActiveList();
+
+  if (list.length <= 1) {
+    return currentSongIndex;
+  }
+
+  let randomIndex;
+
+  do {
+    randomIndex = Math.floor(Math.random() * list.length);
+  } while (randomIndex === currentSongIndex);
+
+  return randomIndex;
+}
+
+// ===============================
+// SAVE AND RESTORE
+// ===============================
+
+function saveState() {
+  if (currentSongIndex === null) return;
+
+  const audio = $("audio");
+
+  localStorage.setItem("playingPlaylist", playingPlaylist);
+  localStorage.setItem("viewingPlaylist", viewingPlaylist);
+  localStorage.setItem("selectedSong", currentSongIndex);
+  localStorage.setItem("currentTime", audio.currentTime || 0);
+  localStorage.setItem("isPlaying", audio.paused ? "false" : "true");
+}
+
+function restoreState() {
+  const savedPlayingPlaylist = localStorage.getItem("playingPlaylist");
+  const savedViewingPlaylist = localStorage.getItem("viewingPlaylist");
+  const savedSong = localStorage.getItem("selectedSong");
+
+  if (savedPlayingPlaylist === null || savedSong === null) {
+    showNoSongSelected();
+    return;
+  }
+
+  playingPlaylist = savedPlayingPlaylist;
+  viewingPlaylist = savedViewingPlaylist || "prayer";
+  currentSongIndex = Number(savedSong);
+
+  const song = getCurrentSong();
+
+  if (!song) {
+    showNoSongSelected();
+    return;
+  }
+
+  $("audio").src = song.url;
+  updatePlayerDisplay(song, false);
+
+  $("audio").addEventListener(
+    "loadedmetadata",
+    function () {
+      const savedTime = Number(localStorage.getItem("currentTime")) || 0;
+
+      if (savedTime < $("audio").duration) {
+        $("audio").currentTime = savedTime;
+      }
+
+      updateTimeDisplay();
+    },
+    { once: true }
+  );
+}
+
+// ===============================
+// BUTTON EVENTS
+// ===============================
+
+function attachEvents() {
+  $("playlistButton").addEventListener("click", function () {
+    showPage("playlist");
+  });
+
+  $("nowPlayingButton").addEventListener("click", function () {
+    showPage("player");
+  });
+
+  $("backMenuBtn").addEventListener("click", function () {
+    showPage("menu");
+  });
+
+  $("backPlaylistBtn").addEventListener("click", backToPlaylists);
+
+  $("backToPlaylistBtn").addEventListener("click", function () {
+    showPage("playlist");
+  });
+
+  document.querySelectorAll(".playlist-card").forEach(function (card) {
+    card.addEventListener("click", function () {
+      openPlaylist(card.dataset.playlist);
+    });
+  });
+
+  $("prevBtn").addEventListener("click", previousSong);
+  $("playBtn").addEventListener("click", togglePlay);
+  $("nextBtn").addEventListener("click", nextSong);
+  $("shuffleBtn").addEventListener("click", toggleShuffle);
+  $("repeatBtn").addEventListener("click", cycleRepeat);
+  $("stopBtn").addEventListener("click", stopSong);
+
+  $("miniPlayBtn").addEventListener("click", togglePlay);
+  $("miniNowPlayingBtn").addEventListener("click", function () {
+    showPage("player");
+  });
+
+  $("audio").addEventListener("timeupdate", function () {
     updateTimeDisplay();
     saveState();
   });
 
-  audio.addEventListener("loadedmetadata", () => {
-    updateTimeDisplay();
-  });
+  $("audio").addEventListener("loadedmetadata", updateTimeDisplay);
 
-  audio.addEventListener("ended", () => {
+  $("audio").addEventListener("ended", function () {
     if (currentSongIndex === null) return;
 
     if (repeatMode === "one") {
@@ -378,154 +539,27 @@ if (audio) {
     } else if (repeatMode === "all") {
       nextSong();
     } else {
-      // Repeat is off and shuffle is off:
-      // stop automatically and show "No song selected"
       stopSong();
     }
   });
-}
 
-if (progress) {
-  progress.addEventListener("input", () => {
-    if (!audio || currentSongIndex === null) return;
-
-    audio.currentTime = progress.value;
-    saveState();
+  $("progress").addEventListener("input", function () {
+    if (currentSongIndex !== null) {
+      $("audio").currentTime = $("progress").value;
+    }
   });
 }
 
-function updateTimeDisplay() {
-  if (!audio || !progress || !currentTime || !duration) return;
-
-  progress.max = audio.duration || 0;
-  progress.value = audio.currentTime || 0;
-
-  currentTime.textContent = formatTime(audio.currentTime);
-  duration.textContent = formatTime(audio.duration);
-}
-
-function formatTime(seconds) {
-  if (!seconds || isNaN(seconds)) {
-    return "00:00";
-  }
-
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = Math.floor(seconds % 60);
-
-  return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
-}
-
 // ===============================
-// Save and Restore State
+// START APP
 // ===============================
 
-function saveState() {
-  if (!audio || currentSongIndex === null) return;
+document.addEventListener("DOMContentLoaded", function () {
+  attachEvents();
 
-  localStorage.setItem("selectedSong", currentSongIndex);
-  localStorage.setItem("currentTime", audio.currentTime || 0);
-  localStorage.setItem("isPlaying", audio.paused ? "false" : "true");
-}
+  $("shuffleBtn").style.opacity = "0.4";
+  $("repeatBtn").style.opacity = "0.4";
 
-function restoreState() {
-  if (!audio) {
-    loadMiniPlayerOnly();
-    return;
-  }
-
-  const savedSong = localStorage.getItem("selectedSong");
-
-  if (savedSong === null) {
-    showNoSongSelected();
-    return;
-  }
-
-  currentSongIndex = Number(savedSong);
-  const song = playlist[currentSongIndex];
-
-  audio.src = song.url;
-
-  if (albumArt) {
-    albumArt.src = song.albumArt;
-    albumArt.alt = song.title;
-    albumArt.style.display = "block";
-  }
-
-  if (title) title.textContent = song.title;
-  if (artist) artist.textContent = song.artist;
-
-  audio.addEventListener("loadedmetadata", () => {
-    const savedTime = Number(localStorage.getItem("currentTime")) || 0;
-
-    if (savedTime < audio.duration) {
-      audio.currentTime = savedTime;
-    }
-
-    updateTimeDisplay();
-
-    if (localStorage.getItem("isPlaying") === "true") {
-      audio.play();
-      if (playBtn) playBtn.textContent = "⏸";
-      if (miniPlayBtn) miniPlayBtn.textContent = "⏸";
-    } else {
-      if (playBtn) playBtn.textContent = "▶";
-      if (miniPlayBtn) miniPlayBtn.textContent = "▶";
-    }
-
-    updateMiniPlayer();
-  }, { once: true });
-}
-
-function loadMiniPlayerOnly() {
-  if (!miniPlayer || !miniTitle || !miniArtist) return;
-
-  const savedSong = localStorage.getItem("selectedSong");
-  const isPlaying = localStorage.getItem("isPlaying");
-
-  if (savedSong === null || isPlaying !== "true") {
-    miniPlayer.style.display = "none";
-    return;
-  }
-
-  const song = playlist[Number(savedSong)];
-
-  miniTitle.textContent = `🎵 ${song.title}`;
-  miniArtist.textContent = song.artist;
-  miniPlayer.style.display = "flex";
-}
-
-// ===============================
-// Helper
-// ===============================
-
-function getRandomSongIndex() {
-  if (playlist.length <= 1) {
-    return currentSongIndex;
-  }
-
-  let randomIndex;
-
-  do {
-    randomIndex = Math.floor(Math.random() * playlist.length);
-  } while (randomIndex === currentSongIndex);
-
-  return randomIndex;
-}
-
-// ===============================
-// Start App
-// ===============================
-
-document.addEventListener("DOMContentLoaded", () => {
-  loadPlaylist();
-  setControlButtonsDefault();
   restoreState();
-
-  if (menuPage && playlistPage && playerPage) {
-    const firstPage = sessionStorage.getItem("firstPage") || "menu";
-    sessionStorage.removeItem("firstPage");
-    showPage(firstPage);
-  }
-
-  updateMiniPlayer();
+  showPage("menu");
 });

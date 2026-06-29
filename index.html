@@ -17,8 +17,8 @@
         <p class="subtitle">Welcome to My Sassy Voice Music Player</p>
 
         <div class="menu-buttons">
-          <button type="button" onclick="showPage('playlist')">📂 Playlist</button>
-          <button type="button" onclick="showPage('player')">🎧 Now Playing</button>
+          <button type="button" id="playlistButton">📂 Playlist</button>
+          <button type="button" id="nowPlayingButton">🎧 Now Playing</button>
         </div>
       </div>
     </section>
@@ -26,21 +26,38 @@
     <!-- PLAYLIST PAGE -->
     <section id="playlistPage" class="page">
       <div class="container">
-        <button type="button" class="link-button" onclick="showPage('menu')">← Menu</button>
+        <button type="button" id="backMenuBtn" class="link-button">← Menu</button>
 
-        <h1>Playlist</h1>
+        <h1> My Sassy Voice Playlist</h1>
+        <p class="subtitle">Choose one playlist</p>
 
-        <div id="playlist"></div>
+        <div id="playlistMenu" class="playlist-menu">
+          <button type="button" class="playlist-card" data-playlist="prayer">
+            <h2>🙏 Prayer Playlist</h2>
+            <p>Prayer and worship songs</p>
+          </button>
+
+          <button type="button" class="playlist-card" data-playlist="scott">
+            <h2>🎹 Scott Joplin Playlist</h2>
+            <p>Scott Joplin Collection</p>
+          </button>
+        </div>
+
+        <div id="playlistSongs" style="display: none;">
+          <button type="button" id="backPlaylistBtn" class="link-button">← All Playlists</button>
+          <h2 id="playlistTitle"></h2>
+          <div id="playlist"></div>
+        </div>
       </div>
     </section>
 
     <!-- PLAYER PAGE -->
     <section id="playerPage" class="page">
       <div class="container">
-        <button type="button" class="link-button" onclick="showPage('playlist')">← Playlist</button>
+        <button type="button" id="backToPlaylistBtn" class="link-button">← Playlist</button>
 
         <section class="player">
-          <img id="albumArt" class="cover" src="" alt="" style="display: none;">
+          <img id="albumArt" class="cover" src="" alt="Album Art">
 
           <h2 id="title">No song selected</h2>
           <p id="artist"></p>
@@ -53,15 +70,15 @@
           </div>
 
           <div class="controls">
-            <button type="button" onclick="previousSong()">⏮</button>
-            <button type="button" id="playBtn" onclick="togglePlay()">▶</button>
-            <button type="button" onclick="nextSong()">⏭</button>
+            <button type="button" id="prevBtn">⏮</button>
+            <button type="button" id="playBtn">▶</button>
+            <button type="button" id="nextBtn">⏭</button>
           </div>
 
           <div class="controls">
-            <button type="button" id="shuffleBtn" onclick="toggleShuffle()">🔀</button>
-            <button type="button" id="repeatBtn" onclick="cycleRepeat()">🔁</button>
-            <button type="button" onclick="stopSong()">⏹</button>
+            <button type="button" id="shuffleBtn">🔀</button>
+            <button type="button" id="repeatBtn">🔁</button>
+            <button type="button" id="stopBtn">⏹</button>
           </div>
         </section>
       </div>
@@ -69,22 +86,21 @@
 
   </main>
 
-  <!-- Bottom Now Playing Bar -->
-  <div id="miniPlayer" class="mini-player" style="display: none;">
+  <!-- MINI PLAYER -->
+  <div id="miniPlayer" class="mini-player">
     <div class="mini-info">
       <strong id="miniTitle"></strong>
       <span id="miniArtist"></span>
     </div>
 
     <div class="mini-controls">
-      <button type="button" id="miniPlayBtn" onclick="togglePlay()">▶</button>
-      <button type="button" onclick="showPage('player')">Now Playing</button>
+      <button type="button" id="miniPlayBtn">▶</button>
+      <button type="button" id="miniNowPlayingBtn">Now Playing</button>
     </div>
   </div>
 
-  <!-- Important: only ONE audio element for the whole app -->
   <audio id="audio"></audio>
 
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
