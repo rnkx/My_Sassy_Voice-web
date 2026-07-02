@@ -68,7 +68,7 @@ class PlaylistViewModel extends ChangeNotifier {
       title: 'Original Rags',
       artist: 'Scott Joplin',
       audioPath: 'assets/audio/Original_Rags.mp3',
-      albumArt: 'assets/images/Original_Rags.png',
+      albumArt: 'assets/images/Original_Rags.jpg',
     ),
   ];
 
